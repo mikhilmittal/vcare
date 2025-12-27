@@ -35,7 +35,7 @@ export default function Services() {
             Medical Services Offered At Home
           </h2>
           <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
-            We offer a variety of healthcare services in the comfort of our patients' homes:
+            We offer a variety of healthcare services in the comfort of our patients&#39; homes:
           </p>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">

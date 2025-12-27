@@ -14,8 +14,8 @@ export default function Hero() {
             Quality Medical Care Delivered At The Comfort of Your Home
           </h1>
           <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-3xl mx-auto">
-            We bring quality medical care into our patients' homes and aim to make primary healthcare 
-            not only more accessible but also more affordable and accountable to our patient's needs.
+            We bring quality medical care into our patients&#39; homes and aim to make primary healthcare 
+            not only more accessible but also more affordable and accountable to our patient&#39;s needs.
           </p>
           <button
             onClick={() => setIsModalOpen(true)}
