@@ -24,9 +24,18 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
   const handleGetCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords;
-          setGeolocation(`${latitude}, ${longitude}`);
+          try {
+            // Use free reverse geocoding API to get location name
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const data = await response.json();
+            const locationName = data.display_name || `${latitude}, ${longitude}`;
+            setGeolocation(locationName);
+          } catch (error) {
+            console.error("Error getting location name:", error);
+            setGeolocation(`${latitude}, ${longitude}`);
+          }
         },
         (error) => {
           console.error("Error getting location:", error);
@@ -257,15 +266,15 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Geolocation
+              Location
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={geolocation}
-                readOnly
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
-                placeholder="Click 'Use Current Location' to auto-fill"
+                onChange={(e) => setGeolocation(e.target.value)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Search for area, street name..."
               />
               <button
                 type="button"
