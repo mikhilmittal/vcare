@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 
 interface BookNowModalProps {
   isOpen: boolean;
@@ -18,86 +18,7 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [pincode, setPincode] = useState("");
-  const [geolocation, setGeolocation] = useState("");
-  const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleGetCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          try {
-            // Use free reverse geocoding API to get location name
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-            const data = await response.json();
-            const locationName = data.display_name || `${latitude}, ${longitude}`;
-            setGeolocation(locationName);
-            setShowSuggestions(false);
-          } catch (error) {
-            console.error("Error getting location name:", error);
-            setGeolocation(`${latitude}, ${longitude}`);
-          }
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          alert("Unable to retrieve your location. Please enter it manually.");
-        }
-      );
-    } else {
-      alert("Geolocation is not supported by your browser. Please enter it manually.");
-    }
-  };
-
-  const searchLocation = async (query: string) => {
-    if (query.length < 3) {
-      setLocationSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`
-      );
-      const data = await response.json();
-      setLocationSuggestions(data);
-      setShowSuggestions(data.length > 0);
-    } catch (error) {
-      console.error("Error searching location:", error);
-      setLocationSuggestions([]);
-    }
-  };
-
-  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setGeolocation(value);
-
-    // Clear previous timeout
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
-    // Debounce search
-    searchTimeoutRef.current = setTimeout(() => {
-      searchLocation(value);
-    }, 500);
-  };
-
-  const handleSuggestionClick = (suggestion: any) => {
-    setGeolocation(suggestion.display_name);
-    setShowSuggestions(false);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, []);
 
   if (!isOpen) return null;
 
@@ -123,7 +44,6 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
       gender ? `Gender: ${gender}` : undefined,
       date ? `Preferred Date: ${date}` : undefined,
       addressParts ? `Address: ${addressParts}` : undefined,
-      geolocation ? `Geolocation: ${geolocation}` : undefined,
     ]
       .filter(Boolean)
       .join("\n");
@@ -151,7 +71,6 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
     setCity("");
     setState("");
     setPincode("");
-    setGeolocation("");
     setIsSubmitting(false);
     onClose();
   };
@@ -316,48 +235,6 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
             </div>
           </div>
 
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Location
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={geolocation}
-                onChange={handleLocationChange}
-                onFocus={() => setShowSuggestions(locationSuggestions.length > 0)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Search for area, street name..."
-              />
-              <button
-                type="button"
-                onClick={handleGetCurrentLocation}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
-              >
-                Use Current Location
-              </button>
-            </div>
-            {showSuggestions && locationSuggestions.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                {locationSuggestions.map((suggestion, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-                  >
-                    <div className="text-sm text-gray-800">{suggestion.display_name}</div>
-                    {suggestion.address && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        {suggestion.address.city && suggestion.address.city + ", "}
-                        {suggestion.address.state && suggestion.address.state}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          
           <div className="flex gap-3 pt-2">
             <button
               type="button"
