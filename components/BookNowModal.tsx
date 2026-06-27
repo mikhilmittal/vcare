@@ -13,7 +13,11 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
   const [date, setDate] = useState("");
-  const [address, setAddress] = useState("");
+  const [addressLine1, setAddressLine1] = useState("");
+  const [addressLine2, setAddressLine2] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [pincode, setPincode] = useState("");
   const [geolocation, setGeolocation] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -44,12 +48,20 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
     const formattedPhone = phoneNumber.replace(/[^\d+]/g, "");
     
     // Create WhatsApp message including additional details
+    const addressParts = [
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      pincode,
+    ].filter(Boolean).join(", ");
+
     const details = [
       `Name: ${name}`,
       `Phone: ${phoneNumber}`,
       gender ? `Gender: ${gender}` : undefined,
       date ? `Preferred Date: ${date}` : undefined,
-      address ? `Address: ${address}` : undefined,
+      addressParts ? `Address: ${addressParts}` : undefined,
       geolocation ? `Geolocation: ${geolocation}` : undefined,
     ]
       .filter(Boolean)
@@ -73,7 +85,11 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
     setPhoneNumber("");
     setGender("");
     setDate("");
-    setAddress("");
+    setAddressLine1("");
+    setAddressLine2("");
+    setCity("");
+    setState("");
+    setPincode("");
     setGeolocation("");
     setIsSubmitting(false);
     onClose();
@@ -161,40 +177,102 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
           </div>
 
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Address
             </label>
-            <input
-              type="text"
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Enter your address"
-            />
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="addressLine1" className="block text-xs text-gray-600 mb-1">
+                  House/Flat No, Building, Street *
+                </label>
+                <input
+                  type="text"
+                  id="addressLine1"
+                  value={addressLine1}
+                  onChange={(e) => setAddressLine1(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="e.g., 123, Main Street"
+                />
+              </div>
+              <div>
+                <label htmlFor="addressLine2" className="block text-xs text-gray-600 mb-1">
+                  Area/Locality
+                </label>
+                <input
+                  type="text"
+                  id="addressLine2"
+                  value={addressLine2}
+                  onChange={(e) => setAddressLine2(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="e.g., Near Central Park"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="city" className="block text-xs text-gray-600 mb-1">
+                    City *
+                  </label>
+                  <input
+                    type="text"
+                    id="city"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="City"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="state" className="block text-xs text-gray-600 mb-1">
+                    State *
+                  </label>
+                  <input
+                    type="text"
+                    id="state"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="State"
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="pincode" className="block text-xs text-gray-600 mb-1">
+                  Pincode/ZIP *
+                </label>
+                <input
+                  type="text"
+                  id="pincode"
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="e.g., 110001"
+                />
+              </div>
+            </div>
           </div>
 
           <div>
-            <label htmlFor="geolocation" className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Geolocation
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
-                id="geolocation"
                 value={geolocation}
-                onChange={(e) => setGeolocation(e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Enter coordinates or use current location"
+                readOnly
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
+                placeholder="Click 'Use Current Location' to auto-fill"
               />
               <button
                 type="button"
                 onClick={handleGetCurrentLocation}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition border border-gray-300"
-                title="Get current location"
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
               >
-                📍
+                Use Current Location
               </button>
             </div>
           </div>
