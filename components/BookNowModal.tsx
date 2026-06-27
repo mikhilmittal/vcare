@@ -13,8 +13,26 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
   const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+  const [address, setAddress] = useState("");
+  const [geolocation, setGeolocation] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleGetCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setGeolocation(`${latitude}, ${longitude}`);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          alert("Unable to retrieve your location. Please enter it manually.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by your browser. Please enter it manually.");
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -31,7 +49,8 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
       `Phone: ${phoneNumber}`,
       gender ? `Gender: ${gender}` : undefined,
       date ? `Preferred Date: ${date}` : undefined,
-      time ? `Preferred Time: ${time}` : undefined,
+      address ? `Address: ${address}` : undefined,
+      geolocation ? `Geolocation: ${geolocation}` : undefined,
     ]
       .filter(Boolean)
       .join("\n");
@@ -54,7 +73,8 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
     setPhoneNumber("");
     setGender("");
     setDate("");
-    setTime("");
+    setAddress("");
+    setGeolocation("");
     setIsSubmitting(false);
     onClose();
   };
@@ -126,32 +146,56 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
-                Preferred Date
-              </label>
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
+              Preferred Date
+            </label>
+            <input
+              type="date"
+              id="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+              Address
+            </label>
+            <input
+              type="text"
+              id="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="Enter your address"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="geolocation" className="block text-sm font-medium text-gray-700 mb-1">
+              Geolocation
+            </label>
+            <div className="flex gap-2">
               <input
-                type="date"
-                id="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                type="text"
+                id="geolocation"
+                value={geolocation}
+                onChange={(e) => setGeolocation(e.target.value)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter coordinates or use current location"
               />
-            </div>
-            <div>
-              <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">
-                Preferred Time
-              </label>
-              <input
-                type="time"
-                id="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
+              <button
+                type="button"
+                onClick={handleGetCurrentLocation}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition border border-gray-300"
+                title="Get current location"
+              >
+                📍
+              </button>
             </div>
           </div>
           
