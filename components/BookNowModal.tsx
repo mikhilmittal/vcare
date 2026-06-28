@@ -22,14 +22,11 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Format phone number (remove any non-digit characters except +)
-    const formattedPhone = phoneNumber.replace(/[^\d+]/g, "");
-    
-    // Create WhatsApp message including additional details
+    // Combine address parts
     const addressParts = [
       addressLine1,
       addressLine2,
@@ -38,41 +35,49 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
       pincode,
     ].filter(Boolean).join(", ");
 
-    const details = [
-      `Name: ${name}`,
-      `Phone: ${phoneNumber}`,
-      gender ? `Gender: ${gender}` : undefined,
-      date ? `Preferred Date: ${date}` : undefined,
-      addressParts ? `Address: ${addressParts}` : undefined,
-    ]
-      .filter(Boolean)
-      .join("\n");
+    try {
+      const response = await fetch('/api/send-whatsapp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          serviceName: serviceName || 'Service Booking',
+          name,
+          phone: phoneNumber,
+          gender,
+          date,
+          address: addressParts,
+        }),
+      });
 
-    let message = serviceName
-      ? `Hello! I would like to book ${serviceName}.\n\n${details}`
-      : `Hello! I would like to book a service.\n\n${details}`;
-    
-    // WhatsApp API link - Your WhatsApp Business number with country code
-    // Format: https://wa.me/[country code][phone number]?text=[message]
-    // Number: 9206912547 (India: +91)
-    const whatsappNumber = "919206912547"; // Your WhatsApp Business number
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    
-    // Open WhatsApp directly
-    window.open(whatsappUrl, "_blank");
-    
-    // Reset form
-    setName("");
-    setPhoneNumber("");
-    setGender("");
-    setDate("");
-    setAddressLine1("");
-    setAddressLine2("");
-    setCity("");
-    setState("");
-    setPincode("");
-    setIsSubmitting(false);
-    onClose();
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error sending WhatsApp message:', errorData);
+        alert('Failed to send booking. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      alert('Booking sent successfully!');
+      
+      // Reset form
+      setName("");
+      setPhoneNumber("");
+      setGender("");
+      setDate("");
+      setAddressLine1("");
+      setAddressLine2("");
+      setCity("");
+      setState("");
+      setPincode("");
+      setIsSubmitting(false);
+      onClose();
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to send booking. Please try again.');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -248,7 +253,7 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
               disabled={isSubmitting}
               className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
             >
-              {isSubmitting ? "Opening WhatsApp..." : "OK"}
+              {isSubmitting ? "Sending..." : "Book Now"}
             </button>
           </div>
         </form>
