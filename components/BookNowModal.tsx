@@ -19,11 +19,67 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
   const [state, setState] = useState("");
   const [pincode, setPincode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [nameError, setNameError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   if (!isOpen) return null;
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only letters, spaces, and max 50 characters
+    if (/^[a-zA-Z\s]*$/.test(value) && value.length <= 50) {
+      setName(value);
+      setNameError("");
+    } else if (value.length > 50) {
+      setNameError("Name must be 50 characters or less");
+    } else {
+      setNameError("Name can only contain letters and spaces");
+    }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only digits and max 10 characters
+    if (/^\d*$/.test(value) && value.length <= 10) {
+      setPhoneNumber(value);
+      if (value.length === 10) {
+        setPhoneError("");
+      } else if (value.length > 0) {
+        setPhoneError("Phone number must be exactly 10 digits");
+      } else {
+        setPhoneError("");
+      }
+    } else {
+      setPhoneError("Phone number can only contain digits");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate before submit
+    let hasError = false;
+    
+    if (!name || name.length === 0) {
+      setNameError("Name is required");
+      hasError = true;
+    } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+      setNameError("Name can only contain letters and spaces");
+      hasError = true;
+    } else if (name.length > 50) {
+      setNameError("Name must be 50 characters or less");
+      hasError = true;
+    }
+    
+    if (!phoneNumber || phoneNumber.length !== 10) {
+      setPhoneError("Phone number must be exactly 10 digits");
+      hasError = true;
+    }
+    
+    if (hasError) {
+      return;
+    }
+    
     setIsSubmitting(true);
 
     // Combine address parts
@@ -107,11 +163,15 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
               type="text"
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={handleNameChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              maxLength={50}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                nameError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary-500'
+              }`}
               placeholder="Enter your name"
             />
+            {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
           </div>
           
           <div>
@@ -122,11 +182,15 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
               type="tel"
               id="phone"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              onChange={handlePhoneChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              maxLength={10}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                phoneError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary-500'
+              }`}
               placeholder="Enter your phone number"
             />
+            {phoneError && <p className="text-red-500 text-xs mt-1">{phoneError}</p>}
           </div>
 
           <div>
