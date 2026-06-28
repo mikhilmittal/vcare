@@ -4,18 +4,10 @@ import { useState } from "react";
 import BookNowModal from "./BookNowModal";
 
 const services = [
-  { name: "Physiotherapy", icon: "🏃" },
-  { name: "Nursing Care", icon: "👩‍⚕️" },
-  { name: "Medical Equipment", icon: "🩺" },
-  { name: "Trained Attendants", icon: "👨‍⚕️" },
-  { name: "Lab Tests", icon: "🧪" },
   { name: "Elder Care", icon: "👴" },
   { name: "Doctor Consultation", icon: "👨‍⚕️" },
-  { name: "Mother & Baby Care", icon: "👶" },
-  { name: "Diabetes Care", icon: "💉" },
+  { name: "Lab Tests", icon: "🧪" },
   { name: "Critical Care", icon: "🚑" },
-  { name: "Covid Care", icon: "🦠" },
-  { name: "Vaccination", icon: "💊" },
 ];
 
 export default function Services() {

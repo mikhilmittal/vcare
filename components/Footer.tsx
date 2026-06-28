@@ -21,10 +21,10 @@ export default function Footer() {
             <div>
               <h4 className="font-semibold mb-4">Our Services</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>Physiotherapy</li>
-                <li>Nursing Care</li>
+                <li>Elder Care</li>
                 <li>Doctor Consultations</li>
-                <li>Medical Equipment</li>
+                <li>Lab Tests</li>
+                <li>Critical Care</li>
               </ul>
             </div>
             

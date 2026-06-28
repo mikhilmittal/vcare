@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "VCare | Quality Medical Care at Home",
-  description: "VCare delivers quality medical care at the comfort of your home. Book now for nursing, physiotherapy, doctor consultations and more.",
+  description: "VCare delivers quality medical care at the comfort of your home. Book now for elder care, doctor consultations, lab tests, and critical care.",
 };
 
 export default function RootLayout({
