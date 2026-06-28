@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ConfirmationModal from "./ConfirmationModal";
 
 interface BookNowModalProps {
   isOpen: boolean;
@@ -23,6 +24,8 @@ export default function BookNowModal({ isOpen, onClose, serviceName, subCategory
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [nameError, setNameError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   if (!isOpen) return null;
 
@@ -114,35 +117,40 @@ export default function BookNowModal({ isOpen, onClose, serviceName, subCategory
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Error sending WhatsApp message:', errorData);
-        alert('Failed to send booking. Please try again.');
+        setSubmitError('Failed to send booking. Please try again.');
         setIsSubmitting(false);
         return;
       }
 
-      alert('Booking sent successfully!');
-      
-      // Reset form
-      setName("");
-      setPhoneNumber("");
-      setGender("");
-      setDate("");
-      setAddressLine1("");
-      setAddressLine2("");
-      setCity("");
-      setState("");
-      setPincode("");
-      setIsSubmitting(false);
-      onClose();
+      setShowConfirmation(true);
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Failed to send booking. Please try again.');
+      setSubmitError('Failed to send booking. Please try again.');
       setIsSubmitting(false);
     }
   };
 
+  const handleConfirmationClose = () => {
+    setShowConfirmation(false);
+    // Reset form
+    setName("");
+    setPhoneNumber("");
+    setGender("");
+    setDate("");
+    setAddressLine1("");
+    setAddressLine2("");
+    setCity("");
+    setState("");
+    setPincode("");
+    setSubmitError("");
+    setIsSubmitting(false);
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+    <>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
         <div className="flex justify-between items-center mb-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Book Now</h2>
@@ -311,6 +319,12 @@ export default function BookNowModal({ isOpen, onClose, serviceName, subCategory
             </div>
           </div>
 
+          {submitError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              {submitError}
+            </div>
+          )}
+
           <div className="flex gap-3 pt-2">
             <button
               type="button"
@@ -330,6 +344,13 @@ export default function BookNowModal({ isOpen, onClose, serviceName, subCategory
         </form>
       </div>
     </div>
+
+    <ConfirmationModal
+      isOpen={showConfirmation}
+      onClose={handleConfirmationClose}
+      phoneNumber={phoneNumber}
+    />
+    </>
   );
 }
 
