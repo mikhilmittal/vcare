@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { serviceName, name, phone, gender, date, address } = body;
+    const { serviceName, subCategory, notes, name, phone, gender, date, address } = body;
 
     // Validate required fields
     if (!name || !phone || !gender || !date || !address) {
@@ -100,6 +100,8 @@ export async function POST(request: NextRequest) {
             html: `
               <h2>New booking received for vcare Health</h2>
               <p><strong>Service:</strong> ${serviceName || 'Service Booking'}</p>
+              ${subCategory ? `<p><strong>Sub-Category:</strong> ${subCategory}</p>` : ''}
+              ${notes ? `<p><strong>Notes:</strong> ${notes}</p>` : ''}
               <p><strong>Patient Name:</strong> ${name}</p>
               <p><strong>Phone Number:</strong> ${phone}</p>
               <p><strong>Gender:</strong> ${gender}</p>

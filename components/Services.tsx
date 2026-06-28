@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import BookNowModal from "./BookNowModal";
+import SubCategoryModal from "./SubCategoryModal";
 
 const services = [
   { name: "Elder Care", icon: "👴" },
@@ -11,12 +12,29 @@ const services = [
 ];
 
 export default function Services() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBookNowModalOpen, setIsBookNowModalOpen] = useState(false);
+  const [isSubCategoryModalOpen, setIsSubCategoryModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<string>("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
+  const [notes, setNotes] = useState<string>("");
 
   const handleServiceClick = (serviceName: string) => {
     setSelectedService(serviceName);
-    setIsModalOpen(true);
+    setIsSubCategoryModalOpen(true);
+  };
+
+  const handleSubCategoryConfirm = (subCategory: string, userNotes: string) => {
+    setSelectedSubCategory(subCategory);
+    setNotes(userNotes);
+    setIsSubCategoryModalOpen(false);
+    setIsBookNowModalOpen(true);
+  };
+
+  const handleBookNowModalClose = () => {
+    setIsBookNowModalOpen(false);
+    setSelectedService("");
+    setSelectedSubCategory("");
+    setNotes("");
   };
 
   return (
@@ -47,7 +65,7 @@ export default function Services() {
             <button
               onClick={() => {
                 setSelectedService("");
-                setIsModalOpen(true);
+                setIsSubCategoryModalOpen(true);
               }}
               className="bg-primary-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-primary-700 transition"
             >
@@ -57,13 +75,21 @@ export default function Services() {
         </div>
       </section>
       
-      <BookNowModal 
-        isOpen={isModalOpen} 
+      <SubCategoryModal
+        isOpen={isSubCategoryModalOpen}
         onClose={() => {
-          setIsModalOpen(false);
+          setIsSubCategoryModalOpen(false);
           setSelectedService("");
         }}
         serviceName={selectedService}
+        onConfirm={handleSubCategoryConfirm}
+      />
+      <BookNowModal 
+        isOpen={isBookNowModalOpen} 
+        onClose={handleBookNowModalClose}
+        serviceName={selectedService}
+        subCategory={selectedSubCategory}
+        notes={notes}
       />
     </>
   );

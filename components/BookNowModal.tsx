@@ -6,9 +6,11 @@ interface BookNowModalProps {
   isOpen: boolean;
   onClose: () => void;
   serviceName?: string;
+  subCategory?: string;
+  notes?: string;
 }
 
-export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowModalProps) {
+export default function BookNowModal({ isOpen, onClose, serviceName, subCategory, notes }: BookNowModalProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
@@ -99,6 +101,8 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
         },
         body: JSON.stringify({
           serviceName: serviceName || 'Service Booking',
+          subCategory: subCategory || '',
+          notes: notes || '',
           name,
           phone: phoneNumber,
           gender,
@@ -144,6 +148,9 @@ export default function BookNowModal({ isOpen, onClose, serviceName }: BookNowMo
             <h2 className="text-2xl font-bold text-gray-800">Book Now</h2>
             {serviceName && (
               <p className="text-sm text-gray-600 mt-1">Service: {serviceName}</p>
+            )}
+            {subCategory && (
+              <p className="text-sm text-gray-600">Sub-Category: {subCategory}</p>
             )}
           </div>
           <button
