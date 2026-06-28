@@ -16,6 +16,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate date is in the future
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate < today) {
+      return NextResponse.json(
+        { error: 'Preferred date must be a future date' },
+        { status: 400 }
+      );
+    }
+
     const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
     const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
     const recipientPhone = process.env.WHATSAPP_RECIPIENT_PHONE;
@@ -100,7 +111,7 @@ export async function POST(request: NextRequest) {
             html: `
               <h2>New booking received for vcare Health</h2>
               <p><strong>Service:</strong> ${serviceName || 'Service Booking'}</p>
-              ${subCategory ? `<p><strong>Sub-Category:</strong> ${subCategory}</p>` : ''}
+              ${subCategory ? `<p><strong>Service Type:</strong> ${subCategory}</p>` : ''}
               ${notes ? `<p><strong>Notes:</strong> ${notes}</p>` : ''}
               <p><strong>Patient Name:</strong> ${name}</p>
               <p><strong>Phone Number:</strong> ${phone}</p>

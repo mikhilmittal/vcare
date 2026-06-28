@@ -22,13 +22,7 @@ const serviceSubCategories: Record<string, string[]> = {
   ],
   "Doctor Consultation": [
     "General Physician Visit",
-    "Pediatrician",
-    "Gynecologist",
-    "Orthopedic Consultation",
-    "Cardiologist Consultation",
-    "Dermatologist Consultation",
-    "ENT Specialist",
-    "Neurologist Consultation",
+    "Pulmonologist",
     "Online Consultation",
     "Home Visit Consultation",
   ],
@@ -78,7 +72,7 @@ export default function SubCategoryModal({
 
   const handleConfirm = () => {
     if (!selectedSubCategory) {
-      alert("Please select a sub-category");
+      alert("Please select a service type");
       return;
     }
     onConfirm(selectedSubCategory, notes);
@@ -106,7 +100,7 @@ export default function SubCategoryModal({
         <div className="space-y-4">
           <div>
             <label htmlFor="subCategory" className="block text-sm font-medium text-gray-700 mb-1">
-              Sub-Category
+              Service Type
             </label>
             <select
               id="subCategory"
@@ -115,7 +109,7 @@ export default function SubCategoryModal({
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
-              <option value="">Select a sub-category</option>
+              <option value="">Select a service type</option>
               {subCategories.map((subCategory, index) => (
                 <option key={index} value={subCategory}>
                   {subCategory}
