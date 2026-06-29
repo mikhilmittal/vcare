@@ -23,7 +23,8 @@ export default function Services() {
     setIsSubCategoryModalOpen(true);
   };
 
-  const handleSubCategoryConfirm = (subCategory: string, userNotes: string) => {
+  const handleSubCategoryConfirm = (serviceName: string, subCategory: string, userNotes: string) => {
+    setSelectedService(serviceName);
     setSelectedSubCategory(subCategory);
     setNotes(userNotes);
     setIsSubCategoryModalOpen(false);

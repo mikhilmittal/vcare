@@ -6,7 +6,7 @@ interface SubCategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   serviceName: string;
-  onConfirm: (subCategory: string, notes: string) => void;
+  onConfirm: (serviceName: string, subCategory: string, notes: string) => void;
 }
 
 const serviceSubCategories: Record<string, string[]> = {
@@ -65,19 +65,25 @@ export default function SubCategoryModal({
 }: SubCategoryModalProps) {
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [notes, setNotes] = useState("");
+  const [selectedService, setSelectedService] = useState(serviceName);
 
   if (!isOpen) return null;
 
-  const subCategories = serviceSubCategories[serviceName] || [];
+  const subCategories = serviceSubCategories[selectedService] || [];
 
   const handleConfirm = () => {
+    if (!selectedService) {
+      alert("Please select a service");
+      return;
+    }
     if (!selectedSubCategory) {
       alert("Please select a service type");
       return;
     }
-    onConfirm(selectedSubCategory, notes);
+    onConfirm(selectedService, selectedSubCategory, notes);
     setSelectedSubCategory("");
     setNotes("");
+    setSelectedService("");
     onClose();
   };
 
@@ -98,6 +104,30 @@ export default function SubCategoryModal({
         </div>
 
         <div className="space-y-4">
+          {!serviceName && (
+            <div>
+              <label htmlFor="service" className="block text-sm font-medium text-gray-700 mb-1">
+                Service
+              </label>
+              <select
+                id="service"
+                value={selectedService}
+                onChange={(e) => {
+                  setSelectedService(e.target.value);
+                  setSelectedSubCategory("");
+                }}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              >
+                <option value="">Select a service</option>
+                {Object.keys(serviceSubCategories).map((service) => (
+                  <option key={service} value={service}>
+                    {service}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label htmlFor="subCategory" className="block text-sm font-medium text-gray-700 mb-1">
               Service Type
@@ -107,7 +137,8 @@ export default function SubCategoryModal({
               value={selectedSubCategory}
               onChange={(e) => setSelectedSubCategory(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              disabled={!selectedService}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100"
             >
               <option value="">Select a service type</option>
               {subCategories.map((subCategory, index) => (
