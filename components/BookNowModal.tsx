@@ -155,11 +155,10 @@ export default function BookNowModal({ isOpen, onClose, serviceName, subCategory
           <div className="flex justify-between items-center mb-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-800">Book Now</h2>
-              {serviceName && (
-                <p className="text-sm text-gray-600 mt-1">Service: {serviceName}</p>
-              )}
-              {subCategory && (
-                <p className="text-sm text-gray-600">Service Type: {subCategory}</p>
+              {(serviceName || subCategory) && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Service: {serviceName}{serviceName && subCategory ? ' - ' : ''}{subCategory}
+                </p>
               )}
             </div>
             <button
