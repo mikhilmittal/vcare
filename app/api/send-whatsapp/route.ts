@@ -5,8 +5,35 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { serviceName, subCategory, notes, name, phone, gender, date, address } = body;
+    const contentType = request.headers.get('content-type') || '';
+    
+    let serviceName, subCategory, notes, name, phone, gender, date, address, prescriptionFileName;
+    
+    if (contentType.includes('multipart/form-data')) {
+      // Handle FormData (for Pharmacy with prescription upload)
+      const formData = await request.formData();
+      serviceName = formData.get('serviceName') as string;
+      subCategory = formData.get('subCategory') as string;
+      notes = formData.get('notes') as string;
+      name = formData.get('name') as string;
+      phone = formData.get('phone') as string;
+      gender = formData.get('gender') as string;
+      date = formData.get('date') as string;
+      address = formData.get('address') as string;
+      const prescriptionFile = formData.get('prescription') as File;
+      prescriptionFileName = prescriptionFile ? prescriptionFile.name : null;
+    } else {
+      // Handle JSON (for regular bookings)
+      const body = await request.json();
+      serviceName = body.serviceName;
+      subCategory = body.subCategory;
+      notes = body.notes;
+      name = body.name;
+      phone = body.phone;
+      gender = body.gender;
+      date = body.date;
+      address = body.address;
+    }
 
     // Validate required fields
     if (!name || !phone || !gender || !date || !address) {
@@ -109,10 +136,11 @@ export async function POST(request: NextRequest) {
             to: email,
             subject: `New Booking: ${serviceName || 'Service Booking'} - ${name}`,
             html: `
-              <h2>New booking received for vcare Health</h2>
+              <h2>New booking received for Swasthghar</h2>
               <p><strong>Service:</strong> ${serviceName || 'Service Booking'}</p>
               ${subCategory ? `<p><strong>Service Type:</strong> ${subCategory}</p>` : ''}
               ${notes ? `<p><strong>Notes:</strong> ${notes}</p>` : ''}
+              ${prescriptionFileName ? `<p><strong>Prescription File:</strong> ${prescriptionFileName}</p>` : ''}
               <p><strong>Patient Name:</strong> ${name}</p>
               <p><strong>Phone Number:</strong> ${phone}</p>
               <p><strong>Gender:</strong> ${gender}</p>

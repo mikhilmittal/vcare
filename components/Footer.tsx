@@ -25,6 +25,8 @@ export default function Footer() {
                 <li>Doctor Consultations</li>
                 <li>Lab Tests</li>
                 <li>Critical Care</li>
+                <li>Pharmacy</li>
+                <li>Ambulance Service</li>
               </ul>
             </div>
             

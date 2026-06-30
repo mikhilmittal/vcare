@@ -40,6 +40,8 @@ const serviceSubCategories: Record<string, string[]> = {
     "Tracheostomy Care",
     "Nebulization",
   ],
+  "Pharmacy": [],
+  "Ambulance Service": [],
 };
 
 export default function SubCategoryModal({

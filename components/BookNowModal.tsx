@@ -9,9 +9,10 @@ interface BookNowModalProps {
   serviceName?: string;
   subCategory?: string;
   notes?: string;
+  prescriptionFile?: File | null;
 }
 
-export default function BookNowModal({ isOpen, onClose, serviceName, subCategory, notes }: BookNowModalProps) {
+export default function BookNowModal({ isOpen, onClose, serviceName, subCategory, notes, prescriptionFile }: BookNowModalProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
@@ -97,22 +98,44 @@ export default function BookNowModal({ isOpen, onClose, serviceName, subCategory
     ].filter(Boolean).join(", ");
 
     try {
-      const response = await fetch('/api/send-whatsapp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          serviceName: serviceName || 'Service Booking',
-          subCategory: subCategory || '',
-          notes: notes || '',
-          name,
-          phone: phoneNumber,
-          gender,
-          date,
-          address: addressParts,
-        }),
-      });
+      let response;
+      
+      if (prescriptionFile) {
+        // Use FormData for file upload
+        const formData = new FormData();
+        formData.append('serviceName', serviceName || 'Service Booking');
+        formData.append('subCategory', subCategory || '');
+        formData.append('notes', notes || '');
+        formData.append('name', name);
+        formData.append('phone', phoneNumber);
+        formData.append('gender', gender);
+        formData.append('date', date);
+        formData.append('address', addressParts);
+        formData.append('prescription', prescriptionFile);
+
+        response = await fetch('/api/send-whatsapp', {
+          method: 'POST',
+          body: formData,
+        });
+      } else {
+        // Use JSON for regular bookings
+        response = await fetch('/api/send-whatsapp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            serviceName: serviceName || 'Service Booking',
+            subCategory: subCategory || '',
+            notes: notes || '',
+            name,
+            phone: phoneNumber,
+            gender,
+            date,
+            address: addressParts,
+          }),
+        });
+      }
 
       if (!response.ok) {
         const errorData = await response.json();

@@ -3,24 +3,47 @@
 import { useState } from "react";
 import BookNowModal from "./BookNowModal";
 import SubCategoryModal from "./SubCategoryModal";
+import PharmacyModal from "./PharmacyModal";
 
 const services = [
   { name: "Elder Care", icon: "👴" },
   { name: "Doctor Consultation", icon: "👨‍⚕️" },
   { name: "Lab Tests", icon: "🧪" },
   { name: "Critical Care", icon: "🚑" },
+  { name: "Pharmacy", icon: "💊" },
+  { name: "Ambulance Service", icon: "🚨" },
 ];
 
 export default function Services() {
   const [isBookNowModalOpen, setIsBookNowModalOpen] = useState(false);
   const [isSubCategoryModalOpen, setIsSubCategoryModalOpen] = useState(false);
+  const [isPharmacyModalOpen, setIsPharmacyModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
+  const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
 
   const handleServiceClick = (serviceName: string) => {
     setSelectedService(serviceName);
-    setIsSubCategoryModalOpen(true);
+    
+    // Pharmacy: Show prescription upload modal
+    if (serviceName === "Pharmacy") {
+      setIsPharmacyModalOpen(true);
+    }
+    // Ambulance: Go directly to booking form (no sub-category)
+    else if (serviceName === "Ambulance Service") {
+      setIsBookNowModalOpen(true);
+    }
+    // Other services: Show sub-category modal
+    else {
+      setIsSubCategoryModalOpen(true);
+    }
+  };
+
+  const handlePharmacyConfirm = (file: File) => {
+    setPrescriptionFile(file);
+    setIsPharmacyModalOpen(false);
+    setIsBookNowModalOpen(true);
   };
 
   const handleSubCategoryConfirm = (serviceName: string, subCategory: string, userNotes: string) => {
@@ -36,6 +59,7 @@ export default function Services() {
     setSelectedService("");
     setSelectedSubCategory("");
     setNotes("");
+    setPrescriptionFile(null);
   };
 
   return (
@@ -76,6 +100,14 @@ export default function Services() {
         </div>
       </section>
       
+      <PharmacyModal
+        isOpen={isPharmacyModalOpen}
+        onClose={() => {
+          setIsPharmacyModalOpen(false);
+          setSelectedService("");
+        }}
+        onConfirm={handlePharmacyConfirm}
+      />
       <SubCategoryModal
         isOpen={isSubCategoryModalOpen}
         onClose={() => {
@@ -91,6 +123,7 @@ export default function Services() {
         serviceName={selectedService}
         subCategory={selectedSubCategory}
         notes={notes}
+        prescriptionFile={prescriptionFile}
       />
     </>
   );
