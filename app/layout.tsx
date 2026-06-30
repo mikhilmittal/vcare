@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "VCare | Quality Medical Care at Home",
-  description: "VCare delivers quality medical care at the comfort of your home. Book now for elder care, doctor consultations, lab tests, and critical care.",
+  title: "Swasthghar | Quality Medical Care at Home",
+  description: "Swasthghar delivers quality medical care at the comfort of your home. Book now for elder care, doctor consultations, lab tests, and critical care.",
 };
 
 export default function RootLayout({
