@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     const contentType = request.headers.get('content-type') || '';
     
-    let serviceName, subCategory, notes, name, phone, gender, date, address, prescriptionFileName;
+    let serviceName, subCategory, notes, name, phone, gender, date, address, prescriptionFileName, prescriptionFile;
     
     if (contentType.includes('multipart/form-data')) {
       // Handle FormData (for Pharmacy with prescription upload)
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       gender = formData.get('gender') as string;
       date = formData.get('date') as string;
       address = formData.get('address') as string;
-      const prescriptionFile = formData.get('prescription') as File;
+      prescriptionFile = formData.get('prescription') as File;
       prescriptionFileName = prescriptionFile ? prescriptionFile.name : null;
     } else {
       // Handle JSON (for regular bookings)
@@ -121,6 +121,17 @@ export async function POST(request: NextRequest) {
     let emailSuccess = false;
     let emailError = null;
     
+    // Convert prescription file to base64 if present
+    let prescriptionAttachment = null;
+    if (prescriptionFile) {
+      const bytes = await prescriptionFile.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      prescriptionAttachment = {
+        filename: prescriptionFileName || 'prescription.pdf',
+        content: buffer.toString('base64'),
+      };
+    }
+    
     try {
       const staffEmails = process.env.STAFF_EMAIL;
       if (!staffEmails) {
@@ -131,7 +142,7 @@ export async function POST(request: NextRequest) {
         const emailList = staffEmails.split(',').map(email => email.trim()).filter(email => email);
         
         for (const email of emailList) {
-          const { data: emailData, error: singleEmailError } = await resend.emails.send({
+          const emailData: any = {
             from: 'vcare Bookings <onboarding@resend.dev>',
             to: email,
             subject: `New Booking: ${serviceName || 'Service Booking'} - ${name}`,
@@ -149,13 +160,20 @@ export async function POST(request: NextRequest) {
               <br>
               <p>Thank you</p>
             `,
-          });
+          };
+          
+          // Add attachment if prescription file exists
+          if (prescriptionAttachment) {
+            emailData.attachments = [prescriptionAttachment];
+          }
+          
+          const { data: emailDataResponse, error: singleEmailError } = await resend.emails.send(emailData);
 
           if (singleEmailError) {
             console.error(`Resend error for ${email}:`, singleEmailError);
             emailError = singleEmailError;
           } else {
-            console.log(`Email sent successfully to ${email}:`, emailData);
+            console.log(`Email sent successfully to ${email}:`, emailDataResponse);
             emailSuccess = true;
           }
         }
