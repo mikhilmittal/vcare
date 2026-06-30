@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface SubCategoryModalProps {
   isOpen: boolean;
@@ -66,6 +66,11 @@ export default function SubCategoryModal({
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [notes, setNotes] = useState("");
   const [selectedService, setSelectedService] = useState(serviceName);
+
+  useEffect(() => {
+    setSelectedService(serviceName);
+    setSelectedSubCategory("");
+  }, [serviceName]);
 
   if (!isOpen) return null;
 
