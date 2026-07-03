@@ -11,11 +11,42 @@ interface PharmacyModalProps {
 export default function PharmacyModal({ isOpen, onClose, onConfirm }: PharmacyModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
 
   if (!isOpen) return null;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        setError("Please upload a PDF file");
+        setSelectedFile(null);
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError("File size must be less than 5MB");
+        setSelectedFile(null);
+        return;
+      }
+      setSelectedFile(file);
+      setError("");
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
     if (file) {
       if (file.type !== "application/pdf") {
         setError("Please upload a PDF file");
@@ -61,23 +92,49 @@ export default function PharmacyModal({ isOpen, onClose, onConfirm }: PharmacyMo
 
         <div className="space-y-4">
           <div>
-            <label htmlFor="prescription" className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Prescription (PDF only, max 5MB)
             </label>
-            <input
-              type="file"
-              id="prescription"
-              accept=".pdf,application/pdf"
-              onChange={handleFileChange}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-            {selectedFile && (
-              <p className="text-sm text-green-600 mt-1">
-                Selected: {selectedFile.name}
-              </p>
-            )}
-            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+            <div
+              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition ${
+                isDragging
+                  ? "border-blue-500 bg-blue-50"
+                  : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => document.getElementById("prescription")?.click()}
+            >
+              <input
+                type="file"
+                id="prescription"
+                accept=".pdf,application/pdf"
+                onChange={handleFileChange}
+                required
+                className="hidden"
+              />
+              {selectedFile ? (
+                <div className="space-y-2">
+                  <svg className="w-12 h-12 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-sm font-medium text-green-600">{selectedFile.name}</p>
+                  <p className="text-xs text-gray-500">Click to change file</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <svg className="w-12 h-12 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <p className="text-sm font-medium text-gray-700">
+                    Click to upload or drag and drop
+                  </p>
+                  <p className="text-xs text-gray-500">PDF files only, max 5MB</p>
+                </div>
+              )}
+            </div>
+            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
           </div>
 
           <div className="flex gap-3 pt-2">

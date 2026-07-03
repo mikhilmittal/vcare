@@ -73,7 +73,7 @@ export default function Services() {
             We offer a variety of healthcare services in the comfort of our patients&#39; homes:
           </p>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {services.map((service, index) => (
               <div
                 key={index}
@@ -84,18 +84,6 @@ export default function Services() {
                 <h3 className="font-semibold text-gray-800">{service.name}</h3>
               </div>
             ))}
-          </div>
-          
-          <div className="text-center">
-            <button
-              onClick={() => {
-                setSelectedService("");
-                setIsSubCategoryModalOpen(true);
-              }}
-              className="bg-primary-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-primary-700 transition"
-            >
-              Book Now
-            </button>
           </div>
         </div>
       </section>
