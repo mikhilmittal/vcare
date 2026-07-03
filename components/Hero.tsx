@@ -2,9 +2,63 @@
 
 import { useState } from "react";
 import BookNowModal from "./BookNowModal";
+import SubCategoryModal from "./SubCategoryModal";
+import PharmacyModal from "./PharmacyModal";
+import ServiceSelectionModal from "./ServiceSelectionModal";
 
 export default function Hero() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isServiceSelectionModalOpen, setIsServiceSelectionModalOpen] = useState(false);
+  const [isBookNowModalOpen, setIsBookNowModalOpen] = useState(false);
+  const [isSubCategoryModalOpen, setIsSubCategoryModalOpen] = useState(false);
+  const [isPharmacyModalOpen, setIsPharmacyModalOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<string>("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
+  const [notes, setNotes] = useState<string>("");
+  const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
+
+  const handleBookNowClick = () => {
+    setIsServiceSelectionModalOpen(true);
+  };
+
+  const handleServiceSelect = (serviceName: string) => {
+    setSelectedService(serviceName);
+    setIsServiceSelectionModalOpen(false);
+    
+    // Pharmacy: Show prescription upload modal
+    if (serviceName === "Pharmacy") {
+      setIsPharmacyModalOpen(true);
+    }
+    // Ambulance: Go directly to booking form (no sub-category)
+    else if (serviceName === "Ambulance Service") {
+      setIsBookNowModalOpen(true);
+    }
+    // Other services: Show sub-category modal
+    else {
+      setIsSubCategoryModalOpen(true);
+    }
+  };
+
+  const handlePharmacyConfirm = (file: File) => {
+    setPrescriptionFile(file);
+    setIsPharmacyModalOpen(false);
+    setIsBookNowModalOpen(true);
+  };
+
+  const handleSubCategoryConfirm = (serviceName: string, subCategory: string, userNotes: string) => {
+    setSelectedService(serviceName);
+    setSelectedSubCategory(subCategory);
+    setNotes(userNotes);
+    setIsSubCategoryModalOpen(false);
+    setIsBookNowModalOpen(true);
+  };
+
+  const handleBookNowModalClose = () => {
+    setIsBookNowModalOpen(false);
+    setSelectedService("");
+    setSelectedSubCategory("");
+    setNotes("");
+    setPrescriptionFile(null);
+  };
 
   return (
     <>
@@ -74,7 +128,7 @@ export default function Hero() {
 
               {/* CTA Button */}
               <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={handleBookNowClick}
                 className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow-lg hover:shadow-xl"
               >
                 Book Now
@@ -96,7 +150,36 @@ export default function Hero() {
         </div>
       </section>
       
-      <BookNowModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ServiceSelectionModal
+        isOpen={isServiceSelectionModalOpen}
+        onClose={() => setIsServiceSelectionModalOpen(false)}
+        onServiceSelect={handleServiceSelect}
+      />
+      <PharmacyModal
+        isOpen={isPharmacyModalOpen}
+        onClose={() => {
+          setIsPharmacyModalOpen(false);
+          setSelectedService("");
+        }}
+        onConfirm={handlePharmacyConfirm}
+      />
+      <SubCategoryModal
+        isOpen={isSubCategoryModalOpen}
+        onClose={() => {
+          setIsSubCategoryModalOpen(false);
+          setSelectedService("");
+        }}
+        serviceName={selectedService}
+        onConfirm={handleSubCategoryConfirm}
+      />
+      <BookNowModal 
+        isOpen={isBookNowModalOpen} 
+        onClose={handleBookNowModalClose}
+        serviceName={selectedService}
+        subCategory={selectedSubCategory}
+        notes={notes}
+        prescriptionFile={prescriptionFile}
+      />
     </>
   );
 }

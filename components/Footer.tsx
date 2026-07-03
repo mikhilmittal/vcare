@@ -2,9 +2,60 @@
 
 import { useState } from "react";
 import BookNowModal from "./BookNowModal";
+import SubCategoryModal from "./SubCategoryModal";
+import PharmacyModal from "./PharmacyModal";
+import ServiceSelectionModal from "./ServiceSelectionModal";
 
 export default function Footer() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isServiceSelectionModalOpen, setIsServiceSelectionModalOpen] = useState(false);
+  const [isBookNowModalOpen, setIsBookNowModalOpen] = useState(false);
+  const [isSubCategoryModalOpen, setIsSubCategoryModalOpen] = useState(false);
+  const [isPharmacyModalOpen, setIsPharmacyModalOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<string>("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
+  const [notes, setNotes] = useState<string>("");
+  const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
+
+  const handleBookNowClick = () => {
+    setIsServiceSelectionModalOpen(true);
+  };
+
+  const handleServiceSelect = (serviceName: string) => {
+    setSelectedService(serviceName);
+    setIsServiceSelectionModalOpen(false);
+    
+    if (serviceName === "Pharmacy") {
+      setIsPharmacyModalOpen(true);
+    }
+    else if (serviceName === "Ambulance Service") {
+      setIsBookNowModalOpen(true);
+    }
+    else {
+      setIsSubCategoryModalOpen(true);
+    }
+  };
+
+  const handlePharmacyConfirm = (file: File) => {
+    setPrescriptionFile(file);
+    setIsPharmacyModalOpen(false);
+    setIsBookNowModalOpen(true);
+  };
+
+  const handleSubCategoryConfirm = (serviceName: string, subCategory: string, userNotes: string) => {
+    setSelectedService(serviceName);
+    setSelectedSubCategory(subCategory);
+    setNotes(userNotes);
+    setIsSubCategoryModalOpen(false);
+    setIsBookNowModalOpen(true);
+  };
+
+  const handleBookNowModalClose = () => {
+    setIsBookNowModalOpen(false);
+    setSelectedService("");
+    setSelectedSubCategory("");
+    setNotes("");
+    setPrescriptionFile(null);
+  };
 
   return (
     <>
@@ -35,7 +86,7 @@ export default function Footer() {
               <p className="text-gray-400 mb-2">Phone: +1 800 121 2323</p>
               <p className="text-gray-400 mb-4">Email: bookings@vcare.com</p>
               <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={handleBookNowClick}
                 className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition"
               >
                 Book Now
@@ -49,7 +100,36 @@ export default function Footer() {
         </div>
       </footer>
       
-      <BookNowModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ServiceSelectionModal
+        isOpen={isServiceSelectionModalOpen}
+        onClose={() => setIsServiceSelectionModalOpen(false)}
+        onServiceSelect={handleServiceSelect}
+      />
+      <PharmacyModal
+        isOpen={isPharmacyModalOpen}
+        onClose={() => {
+          setIsPharmacyModalOpen(false);
+          setSelectedService("");
+        }}
+        onConfirm={handlePharmacyConfirm}
+      />
+      <SubCategoryModal
+        isOpen={isSubCategoryModalOpen}
+        onClose={() => {
+          setIsSubCategoryModalOpen(false);
+          setSelectedService("");
+        }}
+        serviceName={selectedService}
+        onConfirm={handleSubCategoryConfirm}
+      />
+      <BookNowModal 
+        isOpen={isBookNowModalOpen} 
+        onClose={handleBookNowModalClose}
+        serviceName={selectedService}
+        subCategory={selectedSubCategory}
+        notes={notes}
+        prescriptionFile={prescriptionFile}
+      />
     </>
   );
 }
