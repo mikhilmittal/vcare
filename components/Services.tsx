@@ -9,9 +9,9 @@ const services = [
   { name: "Elder Care", icon: "👴" },
   { name: "Doctor Consultation", icon: "👨‍⚕️" },
   { name: "Lab Tests", icon: "🧪" },
-  { name: "Critical Care", icon: "🚑" },
+  { name: "Critical Care", icon: "🚨" },
   { name: "Pharmacy", icon: "💊" },
-  { name: "Ambulance Service", icon: "🚨" },
+  { name: "Ambulance Service", icon: "🚑" },
 ];
 
 export default function Services() {
@@ -69,10 +69,6 @@ export default function Services() {
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
             Medical Services Offered At Home
           </h2>
-          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
-            We offer a variety of healthcare services in the comfort of our patients&#39; homes:
-          </p>
-          
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {services.map((service, index) => (
               <div
