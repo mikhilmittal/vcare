@@ -8,7 +8,7 @@ export default function Footer() {
           <div>
             <h3 className="text-2xl font-bold mb-4">Swasthghar</h3>
             <p className="text-gray-400">
-              Quality medical care delivered at the comfort of your home.
+              Jamshedpur's trusted home healthcare platform — quality medical care delivered right to your doorstep.
             </p>
           </div>
           
@@ -26,13 +26,13 @@ export default function Footer() {
           
           <div>
             <h4 className="font-semibold mb-4">Contact Us</h4>
-            <p className="text-gray-400 mb-2">Phone: +1 800 121 2323</p>
-            <p className="text-gray-400 mb-4">Email: bookings@vcare.com</p>
+            <p className="text-gray-400 mb-2">Phone: +91 83404 20129</p>
+            <p className="text-gray-400 mb-4">Email: swasthghar@protonmail.com</p>
           </div>
         </div>
         
         <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-          <p>&copy; 2025 Swasthghar. All rights reserved.</p>
+          <p>&copy; 2026 Swasthghar. All rights reserved.</p>
         </div>
       </div>
     </footer>
